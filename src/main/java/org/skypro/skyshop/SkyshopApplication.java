@@ -11,3 +11,12 @@ public class SkyshopApplication {
 	}
 
 }
+
+/*
+Критерии оценки: классы иммутабельны, используются стримы, зависимости инжектятся через конструкторы, а служебные поля скрыты из JSON
+ссылки:
+http://localhost:8080/products  - список продуктов
+http://localhost:8080/articles  - список статей
+http://localhost:8080/search?pattern=о   - поиск по букве "о"
+
+*/
