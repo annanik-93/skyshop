@@ -7,6 +7,7 @@ import org.skypro.skyshop.model.product.SimpleProduct;
 import org.skypro.skyshop.model.search.Searchable;
 import org.springframework.stereotype.Service;
 import java.util.*;
+import java.util.Optional;
 
 
 /*
@@ -22,11 +23,13 @@ public class StorageService {
     public StorageService() {
         this.products = new HashMap<>();
         this.articles = new HashMap<>();
-        initStorage(); // Инициализация тестовыми данными
+        initStorage(); /// вызов приватного метода заполнения данными
     }
 
+    /// критерий - заполнение тестовыми данными с уникальными UUID через приватный метод
     private void initStorage() {
         /// из предыдущего проета (старого метода main)
+        // добавление продуктов
         UUID id1 = UUID.randomUUID();
         products.put(id1, new SimpleProduct(id1, "Смартфон", 45000));
 
@@ -46,6 +49,7 @@ public class StorageService {
         products.put(id6, new SimpleProduct(id6, "Клавиатура", 6000));
 
         /// из предыдущего проета (старого метода main)
+        // добавление статей
         UUID artId1 = UUID.randomUUID();
         articles.put(artId1, new Article(
                 artId1,
@@ -61,15 +65,22 @@ public class StorageService {
         ));
     }
 
+    /// возвращает коллекцию всех продуктов
     public Collection<Product> getAllProducts() {
         return products.values();
     }
 
+    /// возвращает коллекцию всех статей
     public Collection<Article> getAllArticles() {
         return articles.values();
     }
 
-    /// шаг 5 - объединяем продукты и статьи в одну общую коллекцию Searchable
+    /// критерий (Шаг 2) - получение продукта по id через Optional
+    public Optional<Product> getProductById(UUID id) {
+        return Optional.ofNullable(products.get(id));
+    }
+
+    /// метод для сервиса поиска - объединяет продукты и статьи в одну коллекцию
     public Collection<Searchable> getAllSearchables() {
         List<Searchable> allItems = new ArrayList<>();
         allItems.addAll(products.values());
