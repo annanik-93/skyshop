@@ -1,5 +1,6 @@
 package org.skypro.skyshop.service;
 
+import org.skypro.skyshop.exception.NoSuchProductException;
 import org.skypro.skyshop.model.basket.BasketItem;
 import org.skypro.skyshop.model.basket.ProductBasket;
 import org.skypro.skyshop.model.basket.UserBasket;
@@ -12,30 +13,29 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Service /// критерий - аннотация @Service
+@Service
 public class BasketService {
-    /// критерий - поля private final
     private final ProductBasket productBasket;
     private final StorageService storageService;
 
-    /// критерий - внедрение зависимостей через конструктор (Constructor Injection)
+    //внедрение зависимостей через конструктор (Constructor Injection)
     @Autowired
     public BasketService(ProductBasket productBasket, StorageService storageService) {
         this.productBasket = productBasket;
         this.storageService = storageService;
     }
 
-    /// метод добавления товара в корзину
+    //метод добавления товара в корзину
     public void addProductToBasket(UUID id) {
-        /// критерий - использован Optional с orElseThrow для проверки и выброса исключения
+        /// критерий - вместо IllegalArgumentException выбрасываем NoSuchProductException
         storageService.getProductById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Продукт с ID " + id + " не найден в магазине."));
+                .orElseThrow(() -> new NoSuchProductException("Продукт с ID " + id + " не найден в магазине."));
 
-        /// если исключение не выброшено, товар существует — добавляем в корзину
+        //если исключение не возникло — добавляем в корзину сессии
         productBasket.addProduct(id);
     }
 
-    /// критерий - метод отображения корзины реализован с помощью Stream API
+    //метод отображения корзины реализован с помощью Stream API
     public UserBasket getUserBasket() {
         Map<UUID, Integer> itemsMap = productBasket.getBasketItems();
 
@@ -44,7 +44,7 @@ public class BasketService {
                     UUID id = entry.getKey();
                     int count = entry.getValue();
 
-                    // Извлекаем продукт из хранилища (он там гарантированно есть, так как прошел валидацию при добавлении)
+                    //извлекаем продукт из хранилища (он там гарантированно есть, так как прошел валидацию при добавлении)
                     Product product = storageService.getProductById(id).orElseThrow();
                     return new BasketItem(product, count);
                 })
